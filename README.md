@@ -10,14 +10,14 @@ SourceMod 1.4.0+
 
 ## ConVars
 
-sm_ssjoinsound - Play sound to connecting players.
-sm_ssjoinsoundpath - Sound played to connecting players.
-sm_ssendmapsound - Play sound on map end.
-sm_ssendmapsoundpath - Sound played on map end.
-sm_sssrsound - Play sound on round start.
-sm_sssrsoundpath - Sound played on round start.
-sm_ssersound - Play sound on round end.
-sm_ssersoundpath - Sound played on round end.
+* sm_ssjoinsound - Play sound to connecting players.
+* sm_ssjoinsoundpath - Sound played to connecting players.
+* sm_ssendmapsound - Play sound on map end.
+* sm_ssendmapsoundpath - Sound played on map end.
+* sm_sssrsound - Play sound on round start.
+* sm_sssrsoundpath - Sound played on round start.
+* sm_ssersound - Play sound on round end.
+* sm_ssersoundpath - Sound played on round end.
 
 ## Changelog
 
