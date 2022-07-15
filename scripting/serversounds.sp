@@ -1,6 +1,7 @@
 #include <sdktools>
 #include <sdktools_sound>
 #include <sourcemod>
+#include <tf2_stocks>
 #pragma semicolon 1
 #define VERSION "1.2"
 
@@ -13,11 +14,17 @@ new Handle:CvarStartRoundSoundName;
 new Handle:CvarStartRoundSoundCheck;
 new Handle:CvarEndRoundSoundName;
 new Handle:CvarEndRoundSoundCheck;
+new Handle:CvarTFWinRoundSoundCheck;
+new Handle:CvarTFWinRoundSoundName;
+new Handle:CvarTFLoseRoundSoundCheck;
+new Handle:CvarTFLoseRoundSoundName;
 
 new String:g_JoinSoundName[128];
 new String:g_EndMapSoundName[128];
 new String:g_StartRoundSoundName[128];
 new String:g_EndRoundSoundName[128];
+new String:g_WinRoundSoundName[128];
+new String:g_LoseRoundSoundName[128];
 new bool:g_LastRound = false;
 
 public Plugin:myinfo = 
@@ -35,6 +42,8 @@ public OnPluginStart()
 	AutoExecConfig(true, "serversounds");
 	HookEvent("round_start", RoundStart);
 	HookEvent("round_end", RoundEnd);
+	HookEvent("teamplay_round_win", TFRoundEnd);
+	
 	CreateConVar("sm_serversounds_version", VERSION, "ServerSounds", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	CvarJoinSoundCheck = CreateConVar("sm_ssjoinsound", "1", "Play sound to connecting players. 0 -No | 1 -Yes", _, true, 0.0, true, 1.0);
 	CvarJoinSoundName = CreateConVar("sm_ssjoinsoundpath", "serversounds/joinserver.mp3", "Sound played to connecting players");
@@ -44,6 +53,10 @@ public OnPluginStart()
 	CvarStartRoundSoundName = CreateConVar("sm_sssrsoundpath", "serversounds/roundstart.mp3", "Sound played on round start");
 	CvarEndRoundSoundCheck = CreateConVar("sm_ssersound", "1", "Play sound on round end. 0 -No | 1 -Yes", _, true, 0.0, true, 1.0);
 	CvarEndRoundSoundName = CreateConVar("sm_ssersoundpath", "serversounds/roundend.mp3", "Sound played on round end");
+	CvarTFWinRoundSoundCheck = CreateConVar("sm_sswrsound", "1", "Play sound on round win. 0 -No | 1 -Yes", _, true, 0.0, true, 1.0);
+	CvarTFWinRoundSoundName = CreateConVar("sm_sswrsoundpath", "serversounds/roundwin.mp3", "Sound played on round win");
+	CvarTFLoseRoundSoundCheck = CreateConVar("sm_sslrsound", "1", "Play sound on round lose. 0 -No | 1 -Yes", _, true, 0.0, true, 1.0);
+	CvarTFLoseRoundSoundName = CreateConVar("sm_sslrsoundpath", "serversounds/roundlose.mp3", "Sound played on round lose");
 }
 
 public OnConfigsExecuted()
@@ -83,6 +96,24 @@ public OnConfigsExecuted()
 		Format(EndRoundPath, sizeof(EndRoundPath), "sound/%s", g_EndRoundSoundName);
 		AddFileToDownloadsTable(EndRoundPath);
 	}
+	
+	if (GetConVarBool(CvarTFWinRoundSoundCheck))
+	{
+		GetConVarString(CvarTFWinRoundSoundName, g_WinRoundSoundName, sizeof(g_WinRoundSoundName));
+		decl String:WinRoundPath[128];
+		PrecacheSound(g_WinRoundSoundName, true);
+		Format(WinRoundPath, sizeof(WinRoundPath), "sound/%s", g_WinRoundSoundName);
+		AddFileToDownloadsTable(WinRoundPath);
+	}
+	
+	if (GetConVarBool(CvarTFLoseRoundSoundCheck))
+	{
+		GetConVarString(CvarTFLoseRoundSoundName, g_LoseRoundSoundName, sizeof(g_LoseRoundSoundName));
+		decl String:LoseRoundPath[128];
+		PrecacheSound(g_LoseRoundSoundName, true);
+		Format(LoseRoundPath, sizeof(LoseRoundPath), "sound/%s", g_LoseRoundSoundName);
+		AddFileToDownloadsTable(LoseRoundPath);
+	}
 }
 
 public Action:RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
@@ -113,6 +144,31 @@ public Action:RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 			EmitSoundToAll(g_EndRoundSoundName);
 		}	
 	}
+}
+
+public Action:TFRoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	int winner = GetEventInt(event, "team");
+	for (int i = 1; i <= MAXPLAYERS; i++)
+	{
+	    if (IsClientInGame(i))
+	    {
+			int clientTeam = GetClientTeam(i);
+			
+			if (clientTeam < 2) 
+			{
+				continue;
+			}
+			if (clientTeam == winner && GetConVarBool(CvarTFWinRoundSoundCheck)) 
+			{
+				EmitSoundToClient(i, g_WinRoundSoundName);
+			} 
+			else if (clientTeam != winner && GetConVarBool(CvarTFLoseRoundSoundCheck)) 
+			{
+				EmitSoundToClient(i, g_LoseRoundSoundName);
+			}
+	    }
+	} 
 }
 
 public OnClientPostAdminCheck(client)
