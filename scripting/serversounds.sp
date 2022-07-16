@@ -43,6 +43,7 @@ public OnPluginStart()
 	HookEvent("round_start", RoundStart);
 	HookEvent("round_end", RoundEnd);
 	HookEvent("teamplay_round_win", TFRoundEnd);
+	HookEvent("teamplay_broadcast_audio", StopRoundEndSound, EventHookMode_Pre);
 	
 	CreateConVar("sm_serversounds_version", VERSION, "ServerSounds", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	CvarJoinSoundCheck = CreateConVar("sm_ssjoinsound", "1", "Play sound to connecting players. 0 -No | 1 -Yes", _, true, 0.0, true, 1.0);
@@ -169,6 +170,23 @@ public Action:TFRoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 			}
 	    }
 	} 
+}
+
+public Action StopRoundEndSound(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	new String:strAudio[40];
+    GetEventString(event, "sound", strAudio, sizeof(strAudio));
+    if (StrEqual(strAudio, "Game.YourTeamWon", false) && GetConVarBool(CvarTFWinRoundSoundCheck))
+    {
+        return Plugin_Handled;
+    }
+
+    if (StrEqual(strAudio, "Game.YourTeamLost", false) && GetConVarBool(CvarTFLoseRoundSoundCheck))
+    {
+        return Plugin_Handled;
+    }
+
+	return Plugin_Continue;
 }
 
 public OnClientPostAdminCheck(client)
