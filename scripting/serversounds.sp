@@ -3,7 +3,7 @@
 #include <sourcemod>
 #include <tf2_stocks>
 #pragma semicolon 1
-#define VERSION "1.2"
+#define VERSION "1.3"
 
 
 new Handle:CvarJoinSoundName;
