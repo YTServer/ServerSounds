@@ -18,9 +18,17 @@ SourceMod 1.4.0+
 * **sm_sssrsoundpath** - Sound played on round start.
 * **sm_ssersound** - Play sound on round end.
 * **sm_ssersoundpath** - Sound played on round end.
+* **sm_sswrsound** - Sound played on round win.
+* **sm_sswrsoundpath** - Sound played on round win.
+* **sm_sslrsound** - Sound played on round lose.
+* **sm_sslrsoundpath** - Sound played on round lose.
 
 ## Changelog
 
+> 2022-07-16 (v1.3)
+>
+> * Add round win / lose sound for tf2
+>
 > 2012-02-12 (v1.2)
 >
 > * Now, if a sound is off, don't download
